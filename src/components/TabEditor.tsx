@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Calle, Grafo } from '../lib/tipos';
-import { Aviso, Seccion, clBoton, clBotonPrimario, clInput } from './ui';
+import { Aviso, Seccion, clBoton, clBotonPrimario, clInput } from './ui/basicos';
+import { tieneCoordenadas } from '../lib/geo';
 
 interface Props {
   grafo: Grafo;
@@ -21,8 +22,11 @@ function siglaUnica(nombre: string, existentes: string[]): string {
 
 export function TabEditor({ grafo, setGrafo, onRestablecer }: Props) {
   const [nombre, setNombre] = useState('');
+  const geo = tieneCoordenadas(grafo);
   const [x, setX] = useState(500);
   const [y, setY] = useState(300);
+  const [lat, setLat] = useState(() => grafo.lugares[0]?.lat ?? 9.93);
+  const [lng, setLng] = useState(() => grafo.lugares[0]?.lng ?? -84.08);
   const [a, setA] = useState('');
   const [b, setB] = useState('');
   const [nueva, setNueva] = useState({ d: 5, t: 10, e: 3 });
@@ -31,7 +35,7 @@ export function TabEditor({ grafo, setGrafo, onRestablecer }: Props) {
   const agregarLugar = () => {
     if (!nombre.trim()) return setError('Escriba un nombre para el lugar.');
     const id = siglaUnica(nombre, grafo.lugares.map((l) => l.id));
-    setGrafo({ ...grafo, lugares: [...grafo.lugares, { id, nombre: nombre.trim(), x, y }] });
+    setGrafo({ ...grafo, lugares: [...grafo.lugares, geo ? { id, nombre: nombre.trim(), x, y, lat, lng } : { id, nombre: nombre.trim(), x, y }] });
     setNombre('');
     setError(null);
   };
@@ -61,12 +65,25 @@ export function TabEditor({ grafo, setGrafo, onRestablecer }: Props) {
           <label className="col-span-3 text-xs">Nombre
             <input className={clInput} value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej.: Museo Nacional" />
           </label>
-          <label className="text-xs">X (0-1000)
-            <input className={clInput} type="number" min={0} max={1000} value={x} onChange={(e) => setX(num(e.target.value, 0, 1000))} />
-          </label>
-          <label className="text-xs">Y (0-620)
-            <input className={clInput} type="number" min={0} max={620} value={y} onChange={(e) => setY(num(e.target.value, 0, 620))} />
-          </label>
+          {geo ? (
+            <>
+              <label className="text-xs">Latitud
+                <input className={clInput} type="number" step={0.001} min={9} max={11} value={lat} onChange={(e) => setLat(num(e.target.value, 9, 11))} />
+              </label>
+              <label className="text-xs">Longitud
+                <input className={clInput} type="number" step={0.001} min={-86} max={-83} value={lng} onChange={(e) => setLng(num(e.target.value, -86, -83))} />
+              </label>
+            </>
+          ) : (
+            <>
+              <label className="text-xs">X (0-1000)
+                <input className={clInput} type="number" min={0} max={1000} value={x} onChange={(e) => setX(num(e.target.value, 0, 1000))} />
+              </label>
+              <label className="text-xs">Y (0-620)
+                <input className={clInput} type="number" min={0} max={620} value={y} onChange={(e) => setY(num(e.target.value, 0, 620))} />
+              </label>
+            </>
+          )}
           <div className="flex items-end"><button className={clBotonPrimario} onClick={agregarLugar}>Agregar</button></div>
         </div>
       </Seccion>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Lugar } from '../lib/tipos';
+import type { Lugar } from '../../lib/tipos';
 
 export function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (

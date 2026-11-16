@@ -1,7 +1,7 @@
 import type { Grafo, Pesos } from '../lib/tipos';
 import type { Modelo } from '../lib/modelo';
 import { TablaMatriz } from './TablaMatriz';
-import { Aviso } from './ui';
+import { Aviso } from './ui/basicos';
 
 export function TabMatrices({ grafo, modelo, pesos }: { grafo: Grafo; modelo: Modelo; pesos: Pesos | null }) {
   const et = grafo.lugares.map((l) => l.id);
